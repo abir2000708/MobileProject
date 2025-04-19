@@ -1,5 +1,6 @@
 package com.example.formationstagefv;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
@@ -13,19 +14,24 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SignInActivity extends AppCompatActivity {
-    private TextView GoToSignUp, GoToForgotPassword;
-    private Button  BtnSignIn ;
-    private EditText EmailSignIn , PasswordSignIn  ;
+    private TextView goToSignUp, goToForgotPassword;
+    private Button btnSignIn;
+    private EditText emailSignIn, passwordSignIn;
     private String inputEmailSignIn;
     private String inputPasswordSignIn;
-    private static final   String REGEX_EMAIL = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
+    private static final String REGEX_EMAIL = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
             + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
 
     private static final String REGEX_PASSWORD = "^.*(?=.{8,})(?=..*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$";
+    private FirebaseAuth firebaseAuth;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,70 +44,80 @@ public class SignInActivity extends AppCompatActivity {
             return insets;
         });
 
-        GoToSignUp = findViewById(R.id.go_to_sign_up);
-        GoToForgotPassword = findViewById(R.id.go_to_forgot_password);
-        BtnSignIn= findViewById(R.id.btn_sign_in);
-        EmailSignIn = findViewById(R.id.email_sign_in);
-        PasswordSignIn = findViewById(R.id.password_sign_in);
+        goToSignUp = findViewById(R.id.go_to_sign_up);
+        goToForgotPassword = findViewById(R.id.go_to_forgot_password);
+        btnSignIn = findViewById(R.id.btn_sign_in);
+        emailSignIn = findViewById(R.id.email_sign_in);
+        passwordSignIn = findViewById(R.id.password_sign_in);
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        progressDialog = new ProgressDialog(this);
 
 
-        GoToForgotPassword.setOnClickListener(v -> {
-            startActivity(new Intent(this, forgotPassword.class));
-
-
+        goToForgotPassword.setOnClickListener(v -> {
+            startActivity(new Intent(this, ForgotPassword.class));
         });
 
-
-        GoToSignUp.setOnClickListener(V -> {
+        goToSignUp.setOnClickListener(V -> {
             startActivity(new Intent(this, SignUpActivity.class));
         });
 
-        BtnSignIn.setOnClickListener(v ->{
+        btnSignIn.setOnClickListener(v -> {
             if (validate()) {
-                Toast.makeText(this, "hello welcome back", Toast.LENGTH_SHORT).show();
+                progressDialog.setMessage("Please wait...");
+                progressDialog.show();
+                firebaseAuth.signInWithEmailAndPassword(inputEmailSignIn, inputPasswordSignIn).addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        checkEmailVerification();
 
+                    } else {
+                        Toast.makeText(this, "Sign in failed ! ", Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
+                    }
+                });
             }
         });
+    }
 
-
-
-
-
-
+    private void checkEmailVerification() {
+        FirebaseUser loggedUser = firebaseAuth.getCurrentUser();
+        if (loggedUser != null) {
+            if (loggedUser.isEmailVerified()) {
+                startActivity(new Intent(this, HomeActivity.class));
+                finish();
+            } else {
+                Toast.makeText(this, "Please verify your email ", Toast.LENGTH_SHORT).show();
+                loggedUser.sendEmailVerification();
+                firebaseAuth.signOut();
+                progressDialog.dismiss();
+            }
+        }
     }
 
     private boolean validate() {
         boolean result = false;
-        inputEmailSignIn = EmailSignIn.getText().toString().trim();
-        inputPasswordSignIn= PasswordSignIn.getText().toString().trim();
+        inputEmailSignIn = emailSignIn.getText().toString().trim();
+        inputPasswordSignIn = passwordSignIn.getText().toString().trim();
 
-        if (!isValidString(inputEmailSignIn , REGEX_EMAIL)) {
-            EmailSignIn.setError("Email is invalid !");
-        }else if (!isValidString(inputPasswordSignIn , REGEX_PASSWORD)){
-            PasswordSignIn.setError("Password is invalid !");
-        }else {
+        if (!isValidString(inputEmailSignIn, REGEX_EMAIL)) {
+            emailSignIn.setError("Email is invalid !");
+        } else if (!isValidString(inputPasswordSignIn, REGEX_PASSWORD)) {
+            passwordSignIn.setError("Password is invalid !");
+        } else {
             result = true;
         }
-
-
         return result;
     }
 
 
-
-
-
-
     private boolean isValidString(String input, String regex) {
         Pattern pattern = Pattern.compile(regex);
-        Matcher mtacher = pattern.matcher(input);;
+        Matcher mtacher = pattern.matcher(input);
+        ;
         return mtacher.matches();
 
 
-
-
     }
-
 
 
 }
