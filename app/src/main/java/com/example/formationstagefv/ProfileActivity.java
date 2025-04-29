@@ -58,6 +58,7 @@ public class ProfileActivity extends AppCompatActivity {
         databaseReference =firebaseDatabase.getReference().child("Users").child(""+loggedUser.getUid());
 
         databaseReference.addValueEventListener(new ValueEventListener() {
+
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
              String fullNameString = snapshot.child("fullName").getValue().toString();
@@ -92,6 +93,21 @@ public class ProfileActivity extends AppCompatActivity {
             finish();
         });
 
+        btnEditProfile.setOnClickListener(v ->{
+             String editedFullName= fullName.getText().toString();
+             String editedPhone= phoneNumber.getText().toString();
+             String editedCin= cin.getText().toString();
+             String editedAddress= address.getText().toString();
+
+
+             databaseReference.child("fullName").setValue(editedFullName);
+             databaseReference.child("phoneNumber").setValue(editedPhone);
+             databaseReference.child("cin").setValue(editedCin);
+             databaseReference.child("address").setValue(editedAddress);
+            Toast.makeText(this, "Your data has been changed successfully  ", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this,ProfileActivity.class));
+
+        });
 
 
 

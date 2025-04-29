@@ -63,7 +63,7 @@ public class SignInActivity extends AppCompatActivity {
 
         boolean rememberIsChecked = sharedPreferences.getBoolean("rememberMe",false);
         if (rememberIsChecked){
-         startActivity( new Intent(this,ProfileActivity.class));
+         startActivity( new Intent(this,HomeActivity.class));
         }
 
         rememberMe.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -107,7 +107,7 @@ public class SignInActivity extends AppCompatActivity {
         FirebaseUser loggedUser = firebaseAuth.getCurrentUser();
         if (loggedUser != null) {
             if (loggedUser.isEmailVerified()) {
-                startActivity(new Intent(this,ProfileActivity.class));
+                startActivity(new Intent(this,HomeActivity.class));
                 finish();
             } else {
                 Toast.makeText(this, "Please verify your email ", Toast.LENGTH_SHORT).show();
