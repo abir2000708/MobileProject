@@ -3,8 +3,10 @@ package com.example.formationstagefv;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,9 +14,11 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
+import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -23,13 +27,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity   {
     private EditText fullName ,email, phoneNumber, cin, address;
     private Button btnEditProfile, btnLogOut ;
      private FirebaseAuth firebaseAuth;
      private FirebaseDatabase firebaseDatabase;
      private DatabaseReference databaseReference;
      private FirebaseUser loggedUser ;
+
+     private ImageView menuProfile;
 
 
 
@@ -51,6 +57,10 @@ public class ProfileActivity extends AppCompatActivity {
         address= findViewById(R.id.address_profile);
         btnEditProfile= findViewById(R.id.btn_edit_profile);
         btnLogOut= findViewById(R.id.btn_log_out);
+        menuProfile = findViewById(R.id.menu_profile);
+
+
+
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseDatabase = FirebaseDatabase.getInstance();
@@ -114,4 +124,9 @@ public class ProfileActivity extends AppCompatActivity {
 
 
     }
+
+    private void navigationDrawer() {
+    }
+
+
 }
